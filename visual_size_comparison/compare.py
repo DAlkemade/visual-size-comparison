@@ -3,9 +3,6 @@ from typing import Dict, List
 
 logger = logging.getLogger(__name__)
 
-class BoundingBox:
-    def __init__(self):
-        pass
 
 class Comparer:
     def __init__(self, objects_lookup: Dict[str, set], imgs_lookup: Dict[int, dict]):
@@ -14,6 +11,12 @@ class Comparer:
         logger.info("Created Comparer")
 
     def compare(self, synset_1: str, synset_2: str) -> List[float]:
+        """Compare the sizes of bounding boxes for all images on which the synsets co-occur.
+
+        :param synset_1: wordnet synset name
+        :param synset_2: wordnet synset name
+        :return: list of relative bounding box sizes
+        """
         cooccurences = self.objects_lookup[synset_1].intersection(self.objects_lookup[synset_2])
         relative_sizes: List[float] = list()
         for img_id in cooccurences:
@@ -25,6 +28,7 @@ class Comparer:
         return self.imgs_lookup[image_id]
 
     def compare_on_image(self, image_id: int, synset_1: str, synset_2: str) -> List[float]:
+        """Compare the bounding box sizes of the synsets on an image."""
         img = self.get_image(image_id)
         max_sizes_1: List[int] = list()
         max_sizes_2: List[int] = list()
