@@ -9,10 +9,13 @@ from visual_size_comparison.compare import Comparer
 from visual_size_comparison.objects import load_images_index, index_objects
 
 import matplotlib.pyplot as plt
+import pandas as pd
 
 set_up_root_logger(f'VG_objects_{datetime.now().strftime("%d%m%Y%H%M%S")}', os.path.join(os.getcwd(), 'logs'))
 
 logger = logging.getLogger(__name__)
+
+METHOD = 'mean'
 
 
 def main():
@@ -63,6 +66,25 @@ def main():
     plt.hist(np.clip(cooccurence_counts, bins[0], bins[-1]), bins=bins)
     plt.xlabel(f'# co-occurrences with {n} most occurring objects')
     plt.show()
+
+    test_objects = pd.read_csv('data/test_objects.csv')
+    test_objects = list(test_objects.itertuples(index=False))
+    results = []
+    for object1 in test_objects:
+        for object2 in test_objects:
+            synset1 = object1.object
+            synset2 = object2.object
+            if synset1 == synset2:
+                continue
+            comp = comparer.compare(synset1, synset2)
+            if METHOD == 'mean':
+                res = np.mean(comp)
+            else:
+                raise ValueError('Unknown method')
+            correct = (object1.size > object2.size) == (res > 1.)
+            results.append(correct)
+
+    logger.info(f'Fraction correct based on test suite: {np.mean(results)}')
 
 
 
