@@ -2,6 +2,7 @@ from typing import List
 
 import pytest
 
+from visual_size_comparison.compare import Comparer
 from visual_size_comparison.objects import index_objects, load_objects
 
 @pytest.fixture
@@ -18,3 +19,10 @@ def test_object_lookup_creation(objects):
     assert type(tree_ids) is set
     assert 1 in tree_ids
     assert 2 in tree_ids
+
+
+def test_comparison(objects):
+    lookup = index_objects(objects)
+    comparer = Comparer(lookup, objects)
+    res = comparer.compare('tree.n.01', 'van.n.05')
+    assert False #TODO
