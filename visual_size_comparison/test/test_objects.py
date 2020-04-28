@@ -25,4 +25,6 @@ def test_comparison(objects):
     lookup = index_objects(objects)
     comparer = Comparer(lookup, objects)
     res = comparer.compare('tree.n.01', 'van.n.05')
-    assert False #TODO
+    assert len(res) == 2
+    for scale in res:
+        assert pytest.approx(3.31, .1) == scale or pytest.approx(1.98, .1) == scale
