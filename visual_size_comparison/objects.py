@@ -19,7 +19,6 @@ def index_objects(img_objects_info: list) -> Dict[str, set]:
     return objects_lookup
 
 
-
 def load_objects(objects_path: str) -> List[dict]:
     """Load VG objects."""
     with open(objects_path, 'r') as f:
@@ -31,5 +30,4 @@ def create_object_lookup(objects_path: str) -> Dict[str, set]:
     objects = load_objects(objects_path)
     return index_objects(objects)
 
-
-#TODO create a dict with the keys being synsets and the values lists of image ids in which the objects occur. Then coocurrences can be found taking the intersection of dict[A] and dict[B]
+# TODO create a dict with the keys being synsets and the values lists of image ids in which the objects occur. Then coocurrences can be found taking the intersection of dict[A] and dict[B]
