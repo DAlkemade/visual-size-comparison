@@ -1,14 +1,17 @@
+import logging
 from typing import Dict, List
 
+logger = logging.getLogger(__name__)
 
 class BoundingBox:
     def __init__(self):
         pass
 
 class Comparer:
-    def __init__(self, objects_lookup: Dict[str, set], imgs_list: List[dict]):
-        self.imgs_list = imgs_list
+    def __init__(self, objects_lookup: Dict[str, set], imgs_lookup: Dict[int, dict]):
+        self.imgs_lookup: Dict[int, dict] = imgs_lookup
         self.objects_lookup = objects_lookup
+        logger.info("Created Comparer")
 
     def compare(self, synset_1: str, synset_2: str) -> List[float]:
         cooccurences = self.objects_lookup[synset_1].intersection(self.objects_lookup[synset_2])
@@ -19,7 +22,7 @@ class Comparer:
         return relative_sizes
 
     def get_image(self, image_id: int):
-        return self.imgs_list[image_id-1]
+        return self.imgs_lookup[image_id]
 
     def compare_on_image(self, image_id: int, synset_1: str, synset_2: str) -> List[float]:
         img = self.get_image(image_id)
