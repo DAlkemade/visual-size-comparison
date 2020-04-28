@@ -27,7 +27,7 @@ def load_objects(objects_path: str) -> List[dict]:
     return objects
 
 
-def create_object_lookup(objects_path: str) -> Dict[str, list]:
+def create_object_lookup(objects_path: str) -> Dict[str, set]:
     objects = load_objects(objects_path)
     return index_objects(objects)
 
