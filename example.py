@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 def main():
     objects_lookup = create_object_lookup('data/objects.json')
-    logger.info(objects_lookup['tree.n.01'])
+    logger.info(f'Number of imgs with a tree: {objects_lookup["tree.n.01"]}')
 
 
 if __name__ == "__main__":
