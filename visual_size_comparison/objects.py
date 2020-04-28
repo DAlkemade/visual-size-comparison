@@ -28,6 +28,3 @@ def load_images_index(objects_path: str) -> Dict[int, dict]:
     for image in images_list:
         images_lookup[image['image_id']] = image
     return images_lookup
-
-
-# TODO create a dict with the keys being synsets and the values lists of image ids in which the objects occur. Then coocurrences can be found taking the intersection of dict[A] and dict[B]

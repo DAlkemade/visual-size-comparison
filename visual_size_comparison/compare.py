@@ -32,7 +32,7 @@ class Comparer:
         img = self.get_image(image_id)
         max_sizes_1: List[int] = list()
         max_sizes_2: List[int] = list()
-        #TODO might be better to first index all synsets for each img to avoid this loop
+        # TODO might be better to first index all synsets for each img to avoid this loop
         for object in img['objects']:
             # TODO think about area vs max(width, height). The second seems to be more consistent with the linguistic bootstrapping
             if synset_1 in object['synsets']:
@@ -43,7 +43,5 @@ class Comparer:
         relative_sizes: List[float] = list()
         for size_1 in max_sizes_1:
             for size_2 in max_sizes_2:
-                relative_sizes.append(size_1/size_2)
+                relative_sizes.append(size_1 / size_2)
         return relative_sizes
-
-

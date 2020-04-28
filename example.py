@@ -3,7 +3,6 @@ import os
 from datetime import datetime
 
 import numpy as np
-
 from logging_setup_dla.logging import set_up_root_logger
 
 from visual_size_comparison.compare import Comparer
