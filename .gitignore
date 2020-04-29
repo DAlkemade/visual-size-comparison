@@ -126,5 +126,6 @@ dmypy.json
 
 .idea/
 *.log
-
-data/
+data/object_alias.txt
+data/object_synsets.json
+data/objects.json
