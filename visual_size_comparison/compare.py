@@ -43,5 +43,8 @@ class Comparer:
         relative_sizes: List[float] = list()
         for size_1 in max_sizes_1:
             for size_2 in max_sizes_2:
-                relative_sizes.append(size_1 / size_2)
+                try:
+                    relative_sizes.append(size_1 / size_2)
+                except ZeroDivisionError:
+                    continue
         return relative_sizes
