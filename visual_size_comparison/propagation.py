@@ -114,7 +114,11 @@ class VisualPropagation:
         logger.debug(f'Unknown: {unknown_count}')
         logger.debug(
             f'Total: {larger_count + smaller_count + unknown_count}. excluding unknown: {larger_count + smaller_count}')
-        fraction_larger = larger_count / (larger_count + smaller_count)
+        try:
+            fraction_larger = larger_count / (larger_count + smaller_count)
+        except ZeroDivisionError:
+            fraction_larger = None
+
         # TODO somehow the reverse examples have slightly different counts
         return fraction_larger
 
