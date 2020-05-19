@@ -64,7 +64,7 @@ class VisualPropagation:
         for pair in pairs:
             self.compare_pair(pair)
 
-    def compare_pair(self, pair: Pair) -> None:
+    def compare_pair(self, pair: Pair) -> float:
         """Use propagation to compare two objects visually.
 
         Finds all paths of lenght <= self.max_path_length between the two objects and computes
