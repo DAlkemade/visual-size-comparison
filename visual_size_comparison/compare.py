@@ -17,12 +17,15 @@ class Comparer:
         :param synset_2: wordnet synset name
         :return: list of relative bounding box sizes
         """
-        cooccurences = self.objects_lookup[synset_1].intersection(self.objects_lookup[synset_2])
+        cooccurences = self.find_cooccurrences(synset_1, synset_2)
         relative_sizes: List[float] = list()
         for img_id in cooccurences:
             relative_sizes_on_img = self.compare_on_image(img_id, synset_1, synset_2)
             relative_sizes += relative_sizes_on_img
         return relative_sizes
+
+    def find_cooccurrences(self, synset_1, synset_2):
+        return self.objects_lookup[synset_1].intersection(self.objects_lookup[synset_2])
 
     def get_image(self, image_id: int):
         return self.imgs_lookup[image_id]
@@ -39,7 +42,6 @@ class Comparer:
                 max_sizes_1.append(max(object['w'], object['h']))
             if synset_2 in object['synsets']:
                 max_sizes_2.append(max(object['w'], object['h']))
-
         relative_sizes: List[float] = list()
         for size_1 in max_sizes_1:
             for size_2 in max_sizes_2:

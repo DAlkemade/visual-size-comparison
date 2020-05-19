@@ -1,5 +1,6 @@
 import logging
 import os
+import sys
 from datetime import datetime
 
 import numpy as np
@@ -17,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 METHOD = 'mean'
 
+N = 20
 
 def main():
     images = load_images_index('data/objects.json')
@@ -36,13 +38,13 @@ def main():
         counts.append((k, len(v)))
 
     counts = list(sorted(counts, key=lambda x: x[1], reverse=True))
-    n = 10
-    most_occurring = counts[:n]
-    logger.info(f"{n} most occurring objects: {most_occurring}")
+    most_occurring = counts[:N]
+    logger.info(f"{N} most occurring objects: {most_occurring}")
 
     # Histogram of counts
     _, values = zip(*counts)
-    bins = np.linspace(0, 200, 50)
+    bins = np.linspace(0, 200, 201)
+    logger.info(f"Bins: {bins}")
     plt.hist(np.clip(values, bins[0], bins[-1]), bins=bins)
     plt.xlabel('# images an object occurs in')
     plt.show()
@@ -62,9 +64,9 @@ def main():
             count += len(intersection)
         cooccurence_counts.append(count)
 
-    bins = np.linspace(0, 200, 200)
+    bins = np.linspace(0, 200, 201)
     plt.hist(np.clip(cooccurence_counts, bins[0], bins[-1]), bins=bins)
-    plt.xlabel(f'# co-occurrences with {n} most occurring objects')
+    plt.xlabel(f'# co-occurrences with {N} most occurring objects')
     plt.show()
 
     test_objects = pd.read_csv('data/test_objects.csv')
@@ -85,6 +87,13 @@ def main():
             results.append(correct)
 
     logger.info(f'Fraction correct based on test suite: {np.mean(results)}')
+
+    k = 10
+    count = 0
+    for v in cooccurence_counts:
+        if v >= k:
+            count += 1
+    logger.info(f'fraction {count/len(values)} at least {k} co-occurrences')
 
 
 
