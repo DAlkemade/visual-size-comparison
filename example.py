@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import sys
@@ -22,7 +23,17 @@ N = 20
 
 def main():
     images = load_images_index('data/objects.json')
-    objects_lookup = index_objects(images)
+    with open('data/object_synsets.json') as f:
+        name_to_synset = json.load(f)
+
+    objects_lookup = index_objects(images, object_synsets=name_to_synset)
+
+    all_synsets = set(name_to_synset.values())
+    logger.info(f'objects_lookups.keys() - all_synsets {len(set(objects_lookup.keys()) - all_synsets)}')
+
+    all_synsets = all_synsets.union(set(objects_lookup.keys()))
+
+
     logger.info(f'Number of imgs with a tree: {len(objects_lookup["tree.n.01"])}')
 
     comparer = Comparer(objects_lookup, images)
@@ -30,12 +41,19 @@ def main():
     logger.info(f'Number of tree_van_comparisons: {len(tree_van_scales)}')
     logger.info(f'Average scale of tree/van : {np.mean(tree_van_scales)}')
 
-
-    logger.info(f'Number of object synsets: {len(objects_lookup.keys())}')
+    #todo MIsmatch in sizes!!!!
+    logger.info(f'Number of object synsets in images: {len(set(objects_lookup.keys()))} out of total {len(all_synsets)}')
     logger.info(f'Number of images: {len(images)}')
     counts = []
-    for k, v in objects_lookup.items():
-        counts.append((k, len(v)))
+    never_occurs = set()
+    for synset_name in all_synsets:
+        try:
+            v = len(objects_lookup[synset_name])
+        except KeyError:
+            never_occurs.add(synset_name)
+            v = 0
+        counts.append((synset_name, v))
+    logger.info(f'Objects that never occur: {never_occurs}')
 
     counts = list(sorted(counts, key=lambda x: x[1], reverse=True))
     most_occurring = counts[:N]
@@ -45,9 +63,10 @@ def main():
     _, values = zip(*counts)
     bins = np.linspace(0, 200, 201)
     logger.info(f"Bins: {bins}")
-    plt.hist(np.clip(values, bins[0], bins[-1]), bins=bins)
+    bin_counts, _, _ = plt.hist(np.clip(values, bins[0], bins[-1]), bins=bins)
     plt.xlabel('# images an object occurs in')
     plt.show()
+    logger.info(f'Number of objects that never occur {bin_counts[0]}')
 
     # Histogram of co-occurrence with most_occurring
     # most_occurring_img_sets = [objects_lookup[synset] for synset, _ in most_occurring]

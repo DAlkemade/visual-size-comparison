@@ -5,7 +5,8 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import tqdm
-from breds.visual import VisualConfig
+
+from visual_size_comparison.config import VisualConfig
 
 logger = logging.getLogger(__name__)
 
@@ -75,7 +76,7 @@ class VisualPropagation:
         """
         assert pair.both_in_list(list(self.visual_config.entity_to_synsets.keys()))  # TODO maybe quite expensive
         paths = self.find_paths(pair)
-        logger.info(f'Using {len(paths)} paths')
+        logger.debug(f'Using {len(paths)} paths')
         larger_count = 0
         smaller_count = 0
         unknown_count = 0
