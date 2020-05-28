@@ -35,6 +35,7 @@ class Pair:
         self.e2 = e2
         self.e1 = e1
         self.larger = None
+        self.larger_gold = None
 
     def both_in_list(self, objects: list):
         return self.e1 in objects and self.e2 in objects
@@ -45,6 +46,7 @@ class VisualPropagation:
         self.visual_config: VisualConfig = visual_config
         self.max_path_length: int = max_path_length
         self.cooccurrence_graph: nx.Graph = cooccurrence_graph
+        self.useful_path_counts = []
 
     def find_paths(self, pair: Pair, draw=False) -> List[List[str]]:
         good_paths = list(nx.all_simple_paths(self.cooccurrence_graph, pair.e1, pair.e2, cutoff=self.max_path_length))
@@ -115,6 +117,9 @@ class VisualPropagation:
         logger.debug(f'Unknown: {unknown_count}')
         logger.debug(
             f'Total: {larger_count + smaller_count + unknown_count}. excluding unknown: {larger_count + smaller_count}')
+
+        useful_count = larger_count + smaller_count
+        self.useful_path_counts.append(useful_count)
         try:
             fraction_larger = larger_count / (larger_count + smaller_count)
         except ZeroDivisionError:
