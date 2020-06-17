@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 def build_cooccurrence_graph(objects: list, visual_config: VisualConfig) -> nx.Graph:
+    """Builds a graph of cooccurrences."""
     G = nx.Graph()
     G.add_nodes_from(objects)
     logger.info(f'Number of nodes: {G.number_of_nodes()}')
@@ -47,6 +48,7 @@ class VisualPropagation:
         self.cooccurrence_graph: nx.Graph = cooccurrence_graph
 
     def find_paths(self, pair: Pair, draw=False) -> List[List[str]]:
+        """Find all paths between two objects."""
         good_paths = list(nx.all_simple_paths(self.cooccurrence_graph, pair.e1, pair.e2, cutoff=self.max_path_length))
 
         logger.debug(f'Found paths: {good_paths}')
