@@ -6,6 +6,7 @@ from datetime import datetime
 
 import numpy as np
 from logging_setup_dla.logging import set_up_root_logger
+from matplotlib import ticker
 
 from visual_size_comparison.compare import Comparer
 from visual_size_comparison.objects import load_images_index, index_objects
@@ -20,6 +21,7 @@ logger = logging.getLogger(__name__)
 METHOD = 'mean'
 
 N = 20
+
 
 def main():
     images = load_images_index('data/objects.json')
@@ -41,7 +43,6 @@ def main():
     logger.info(f'Number of tree_van_comparisons: {len(tree_van_scales)}')
     logger.info(f'Average scale of tree/van : {np.mean(tree_van_scales)}')
 
-    #todo MIsmatch in sizes!!!!
     logger.info(f'Number of object synsets in images: {len(set(objects_lookup.keys()))} out of total {len(all_synsets)}')
     logger.info(f'Number of images: {len(images)}')
     counts = []
@@ -59,35 +60,24 @@ def main():
     most_occurring = counts[:N]
     logger.info(f"{N} most occurring objects: {most_occurring}")
 
-    # Histogram of counts
-    _, values = zip(*counts)
-    bins = np.linspace(0, 200, 201)
-    logger.info(f"Bins: {bins}")
-    bin_counts, _, _ = plt.hist(np.clip(values, bins[0], bins[-1]), bins=bins)
-    plt.xlabel('# images an object occurs in')
-    plt.show()
-    logger.info(f'Number of objects that never occur {bin_counts[0]}')
+
+    values = plot_occurrences(counts, update_ticks)
 
     # Histogram of co-occurrence with most_occurring
     # most_occurring_img_sets = [objects_lookup[synset] for synset, _ in most_occurring]
-    logger.info("Find co-occurrences")
-    cooccurence_counts = []
-    for k in objects_lookup.keys():
-        count = 0
-        img_set = objects_lookup[k]
-        for synset_most, _ in most_occurring:
-            if synset_most == k:
-                continue # don't check cooccurrence with itself
-            img_set_most = objects_lookup[synset_most]
-            intersection = img_set.intersection(img_set_most)
-            count += len(intersection)
-        cooccurence_counts.append(count)
+    cooccurence_counts = plot_cooccurrences(most_occurring, objects_lookup)
 
-    bins = np.linspace(0, 200, 201)
-    plt.hist(np.clip(cooccurence_counts, bins[0], bins[-1]), bins=bins)
-    plt.xlabel(f'# co-occurrences with {N} most occurring objects')
-    plt.show()
+    quick_evaluation(comparer)
 
+    k = 10
+    count = 0
+    for v in cooccurence_counts:
+        if v >= k:
+            count += 1
+    logger.info(f'fraction {count/len(values)} at least {k} co-occurrences')
+
+
+def quick_evaluation(comparer):
     test_objects = pd.read_csv('data/test_objects.csv')
     test_objects = list(test_objects.itertuples(index=False))
     results = []
@@ -104,19 +94,50 @@ def main():
                 raise ValueError('Unknown method')
             correct = (object1.size > object2.size) == (res > 1.)
             results.append(correct)
-
     logger.info(f'Fraction correct based on test suite: {np.mean(results)}')
 
-    k = 10
-    count = 0
-    for v in cooccurence_counts:
-        if v >= k:
-            count += 1
-    logger.info(f'fraction {count/len(values)} at least {k} co-occurrences')
+
+def plot_cooccurrences(most_occurring, objects_lookup):
+    logger.info("Find co-occurrences")
+    cooccurence_counts = []
+    for k in objects_lookup.keys():
+        count = 0
+        img_set = objects_lookup[k]
+        for synset_most, _ in most_occurring:
+            if synset_most == k:
+                continue  # don't check cooccurrence with itself
+            img_set_most = objects_lookup[synset_most]
+            intersection = img_set.intersection(img_set_most)
+            count += len(intersection)
+        cooccurence_counts.append(count)
+    fig, axes = plt.subplots()
+    bins = np.linspace(0, 200, 201)
+    plt.hist(np.clip(cooccurence_counts, bins[0], bins[-1]), bins=bins)
+    axes.xaxis.set_major_formatter(ticker.FuncFormatter(update_ticks))
+    plt.xlabel(f'# co-occurrences with {N} most occurring objects')
+    plt.show()
+    return cooccurence_counts
 
 
+def update_ticks(x, pos):
+    print(x)
+    if x == 200.0:
+        return '>200'
+    else:
+        return x
 
-
+def plot_occurrences(counts, update_ticks):
+    fig, axes = plt.subplots()
+    # Histogram of counts
+    _, values = zip(*counts)
+    bins = np.linspace(0, 200, 201)
+    logger.info(f"Bins: {bins}")
+    bin_counts, _, _ = axes.hist(np.clip(values, bins[0], bins[-1]), bins=bins)
+    plt.xlabel('# images an object occurs in')
+    axes.xaxis.set_major_formatter(ticker.FuncFormatter(update_ticks))
+    plt.show()
+    logger.info(f'Number of objects that never occur {bin_counts[0]}')
+    return values
 
 
 if __name__ == "__main__":
